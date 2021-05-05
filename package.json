@@ -1,0 +1,14 @@
+{
+  "name": "translationremover",
+  "version": "0.1.0",
+  "description": "Removes translations from DHIS2 metadata objects by locale code.",
+  "main": "translationRemove.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Morten Haugen",
+  "license": "ISC",
+  "dependencies": {
+    "sort-json": "^2.0.0"
+  }
+}

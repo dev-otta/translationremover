@@ -38,7 +38,7 @@ function main() {
     if (metadata) {
         console.log(`Locale(s) to remove: ${options.localesToRemove}`);
         propertyWalker(metadata, options);
-        console.log(`Translations removed: ${count}`);
+        console.log( (mode == '-r' ? `Translations removed: ${count}` : `Translations kept: ${count}`) );
     }
 
     // Save metadata
@@ -49,34 +49,43 @@ function main() {
 
 function propertyWalker(obj, options) {
 
-    for (let key in obj) {
- 
-        if (obj.hasOwnProperty('translations')) {
-            let indexToRemove = [];
-            for (index in obj.translations) {
+    if (obj.hasOwnProperty('translations')) {
+        let indexToRemove = [];
+        let translationsToKeep = [];
+        for (index in obj.translations) {
+            if (mode == '-r') {
                 for (locale of options.localesToRemove) {
-                    if (mode == '-r') {
-                        if (obj.translations[index].locale == locale) {
-                            count++;
-                            //console.log(`${obj.translations[index].locale} : ${obj.translations[index].value}`);
-                            indexToRemove.push(index);
-                        }
-                    } else {
-                        if (obj.translations[index].locale != locale) {
-                            count++;
-                            //console.log(`${obj.translations[index].locale} : ${obj.translations[index].value}`);
-                            indexToRemove.push(index);
-                        }
+                    if (obj.translations[index].locale == locale) {
+                        count++;
+                        //console.log(`${obj.translations[index].locale} : ${obj.translations[index].value}`);
+                        indexToRemove.push(index);
                     }
                 }
             }
-            while(indexToRemove.length) {
-                obj.translations.splice(indexToRemove.pop(), 1);
+            if (mode == '-k') {
+                for (locale of options.localesToRemove) {
+                    if (obj.translations[index].locale == locale) {
+                        count++;
+                        //console.log(`${obj.translations[index].locale} : ${obj.translations[index].value}`);
+                        translationsToKeep.push(obj.translations[index]);
+                    }
+
+                }
+
             }
         }
+        while (indexToRemove.length) {
+            obj.translations.splice(indexToRemove.pop(), 1);
+        }
+        if (mode == '-k') {
+            obj.translations = translationsToKeep;
+        }
+    }
+
+    for (let key in obj) {
         if (obj.hasOwnProperty(key) && (typeof obj[key] === 'object')) {
-                propertyWalker(obj[key], options);
-            }
+            propertyWalker(obj[key], options);
+        }
     }
 }
 
